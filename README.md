@@ -2,15 +2,15 @@
 
 <img src="static/img/trinity.svg" alt="" width="96" />
 
-# Trinity Stake
+# Trinity
 
-**The Trinity Stake website, and the home of Katacomb VPN.**
+**The Trinity website, and the home of Katacomb VPN.**
 
-[![Deploy](https://github.com/trinitystake/website/actions/workflows/deploy.yml/badge.svg)](https://github.com/trinitystake/website/actions/workflows/deploy.yml)
+[![Deploy](https://github.com/proofoftrinity/proofoftrinity.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/proofoftrinity/proofoftrinity.github.io/actions/workflows/deploy.yml)
 [![Docusaurus](https://img.shields.io/badge/Docusaurus-3.10-3ECC5F?logo=docusaurus&logoColor=white)](https://docusaurus.io/)
 [![Node](https://img.shields.io/badge/Node-20%2B-5FA04E?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-[**Live site**](https://trinitystake.github.io/website/) · [Katacomb VPN](https://trinitystake.github.io/website/katacomb-vpn) · [Validator status](https://p2pscan.com/validator/sentvaloper1mcwvu4vpvfcnxduzpelehmgga282wtc0xux7se)
+[**Live site**](https://proofoftrinity.github.io/) · [Katacomb VPN](https://proofoftrinity.github.io/katacomb-vpn) · [Validator status](https://p2pscan.com/validator/sentvaloper1mcwvu4vpvfcnxduzpelehmgga282wtc0xux7se)
 
 </div>
 
@@ -18,8 +18,7 @@
 
 A Docusaurus 3 site with the docs and blog plugins switched off. Every page is a React
 component under `src/pages`, the look comes from one stylesheet, and dark mode is the
-only mode. It covers who Trinity Stake is, how to run and monitor a Sentinel node, and
-the Katacomb VPN desktop client.
+only mode. It covers who Trinity is and the Katacomb VPN desktop client.
 
 ## Quick start
 
@@ -31,8 +30,7 @@ npm install     # first time; use npm ci for an exact install from the lockfile
 npm start       # dev server with live reload
 ```
 
-The dev server runs at **http://localhost:3000/website/**. The `/website/` suffix is not a
-typo, it is the `baseUrl` that matches the GitHub Pages path.
+The dev server runs at **http://localhost:3000/**.
 
 Other commands worth knowing:
 
@@ -46,7 +44,7 @@ npm run clear   # drop the Docusaurus cache when output looks stale
 
 | Path | What lives there |
 | :--- | :--- |
-| `src/pages/index.jsx` | Homepage: hero, About, Guides |
+| `src/pages/index.jsx` | Homepage: hero, About |
 | `src/pages/katacomb-vpn.jsx` | Katacomb VPN: screenshots, downloads, verification, security model |
 | `src/components/HomepageComponents.jsx` | `HomepageSection` and `HomepageCard`, the blocks both pages are built from |
 | `src/components/icons.jsx` | Inline SVG icons |
@@ -60,7 +58,7 @@ npm run clear   # drop the Docusaurus cache when output looks stale
 
 The version, download links and file sizes on the Katacomb page are never edited by hand.
 At build time, `plugins/katacomb-release` asks the GitHub API for the latest release of
-[katacomb-vpn](https://github.com/trinitystake/katacomb-vpn) and publishes it as global
+[katacomb-vpn](https://github.com/proofoftrinity/katacomb-vpn) and publishes it as global
 data, which the pages read through `usePluginData('katacomb-release')`.
 
 Cutting a release on GitHub is therefore the whole update. The next build carries the new

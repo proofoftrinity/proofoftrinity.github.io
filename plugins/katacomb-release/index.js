@@ -49,7 +49,7 @@ module.exports = function katacombRelease() {
           {
             headers: {
               Accept: 'application/vnd.github+json',
-              'User-Agent': 'trinitystake-website-build',
+              'User-Agent': 'proofoftrinity-website-build',
             },
           },
         );

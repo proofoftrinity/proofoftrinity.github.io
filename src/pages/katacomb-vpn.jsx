@@ -141,7 +141,7 @@ export default function KatacombVPN() {
           <Section
             title="What it does"
             accentColor={ACCENT}
-            description="Everything runs locally against the chain. There is no Trinity Stake server in the path.">
+            description="Everything runs locally against the chain. There is no Trinity server in the path.">
             <Card
               icon={<GlobeIcon />}
               title="Map and node table"
