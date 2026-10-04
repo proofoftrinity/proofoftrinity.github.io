@@ -1,4 +1,4 @@
-const REPO = 'trinitystake/katacomb-vpn';
+const REPO = 'proofoftrinity/katacomb-vpn';
 const RELEASES = `https://github.com/${REPO}/releases`;
 
 // Used when the GitHub API can't be reached, so an offline or rate-limited

@@ -19,7 +19,7 @@ import {
   ServerIcon,
 } from '../components/icons';
 
-const REPO = 'https://github.com/trinitystake/katacomb-vpn';
+const REPO = 'https://github.com/proofoftrinity/katacomb-vpn';
 
 // Fingerprint of the key the release checksums are signed with. Published here
 // so it reaches you over a different channel than the binaries themselves.

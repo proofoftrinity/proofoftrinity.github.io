@@ -5,7 +5,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Trinity Stake',
+  title: 'Trinity',
   tagline: 'Professional Sentinel validation service',
   favicon: 'img/favicon.png',
 
@@ -61,9 +61,9 @@ const config = {
       // Replace with your project's social card
       image: 'img/trinity-social-card.png',
       navbar: {
-        title: 'Trinity Stake',
+        title: 'Trinity',
         logo: {
-          alt: 'Trinity Stake Logo',
+          alt: 'Trinity Logo',
           src: 'img/trinity.svg',
         },
         items: [
@@ -73,38 +73,8 @@ const config = {
             label: 'Katacomb VPN',
           },
           {
-            to: 'https://docs.sentinel.co/get-started',
-            // sidebarid: 'resourcesSidebar',
-            position: 'left',
-            label: 'Learn Sentinel',
-          },
-          {
-            label: 'Guides',
-            type: 'dropdown',
-            position: 'left',
-            items: [
-              {
-                to: 'https://docs.sentinel.co/dvpn-node-setup',
-                label: 'Run a dVPN Node',
-              },
-              {
-                to: 'https://docs.sentinel.co/full-node-setup',
-                label: 'Run a Full Node & Validate',
-              },
-              {
-                to: 'https://docs.sentinel.co/node-monitoring',
-                label: 'Node Monitoring',
-              },
-            ],
-          },
-          {
-            label: 'Validator Status',
-            to: 'https://p2pscan.com/validator/sentvaloper1mcwvu4vpvfcnxduzpelehmgga282wtc0xux7se',
-            position: 'left'
-          },
-          {
             label: 'Find us',
-            to: 'https://linktr.ee/trinitystake',
+            to: 'https://linktr.ee/proofoftrinity',
             position: 'right',
           },
           {
@@ -131,7 +101,7 @@ const config = {
             ],
           },
           {
-            href: 'https://github.com/trinitystake',
+            href: 'https://github.com/proofoftrinity',
             className: 'pseudo-icon github-icon',
             position: 'right',
           },
@@ -149,9 +119,9 @@ const config = {
       footer: {
         style: 'dark',
         logo: {
-          alt: 'Trinity Stake',
+          alt: 'Trinity',
           src: 'img/trinity-wordmark.svg',
-          width: 200,
+          width: 129,
         },
         links: [
           {
@@ -167,35 +137,12 @@ const config = {
               },
               {
                 label: 'Source',
-                href: 'https://github.com/trinitystake/katacomb-vpn',
+                href: 'https://github.com/proofoftrinity/katacomb-vpn',
               },
               {
                 label: 'Releases',
-                href: 'https://github.com/trinitystake/katacomb-vpn/releases',
+                href: 'https://github.com/proofoftrinity/katacomb-vpn/releases',
               },
-            ],
-          },
-          {
-            title: 'Guides',
-            items: [
-              {
-                label: 'Run a dVPN Node',
-                to: 'https://docs.sentinel.co/dvpn-node-setup',
-              },
-              {
-                label: 'Run a Full Node & Validate',
-                to: 'https://docs.sentinel.co/full-node-setup',
-              },
-              {
-                label: 'Node Monitoring',
-                to: 'https://docs.sentinel.co/node-monitoring',
-              },
-              /*
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
-              */
             ],
           },
           {
@@ -203,11 +150,11 @@ const config = {
             items: [
               {
                 label: 'X',
-                href: 'https://x.com/trinitystake',
+                href: 'https://x.com/proofoftrinity',
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/trinitystake',
+                href: 'https://github.com/proofoftrinity',
               },
               {
                 label: 'KeyBase',
@@ -237,7 +184,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} - Trinity Stake`,
+        copyright: `Copyright © ${new Date().getFullYear()} - Trinity`,
       },
       prism: {
         theme: prismThemes.github,

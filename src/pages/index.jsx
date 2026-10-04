@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <Layout
-      title="Trinity Stake"
+      title="Trinity"
       description="Professional Sentinel validation service."
       wrapperClassName="homepage">
       <div className="pad">
@@ -28,7 +28,7 @@ export default function Home() {
           <section className="hero-section" aria-labelledby="hero-heading">
             <div className="hero-glow" aria-hidden="true" />
             <h1 id="hero-heading" className="hero-title">
-              <span className="hero-title-gradient">Trinity Stake</span>
+              <span className="hero-title-gradient">Trinity</span>
             </h1>
             <p className="hero-subtitle">
               Professional Sentinel validation service. We run a hardened
@@ -54,7 +54,7 @@ export default function Home() {
             <Card
               title="Who We Are"
               description="We run monitoring around our validator to track uptime and missed blocks, preventing jailing or tombstoning. Prometheus collects time-series data; Grafana surfaces it through dashboards we maintain ourselves."
-              to="https://linktr.ee/trinitystake"
+              to={VALIDATOR_URL}
               svgFile={trinityIcon}
             />
             <Card
@@ -68,27 +68,6 @@ export default function Home() {
               title="What is Sentinel"
               description="Sentinel is a decentralized VPN built on Cosmos. It routes traffic through a network of distributed nodes with strong encryption, giving users private and secure access to the internet."
               to="https://sentinel.co"
-              svgFile={sentinelIcon}
-            />
-          </Section>
-
-          <Section title="Guides" accentColor="#4dabff">
-            <Card
-              title="Run a dVPN Node"
-              description="Deploy a dVPN node on Sentinel and start earning by contributing bandwidth to the network."
-              to="https://docs.sentinel.co/dvpn-node-setup"
-              svgFile={sentinelIcon}
-            />
-            <Card
-              title="Run a Full Node & Validate"
-              description="Spin up a full Sentinel node and join the validator set securing the chain."
-              to="https://docs.sentinel.co/full-node-setup"
-              svgFile={sentinelIcon}
-            />
-            <Card
-              title="Node Monitoring"
-              description="Set up Prometheus and Grafana to monitor validator uptime, missed blocks, and chain health."
-              to="https://docs.sentinel.co/node-monitoring"
               svgFile={sentinelIcon}
             />
           </Section>
