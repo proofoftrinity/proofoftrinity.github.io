@@ -31,6 +31,13 @@ const ACCENT = '#e1bc99';
 
 const SHOTS = [
   {
+    src: 'img/katacomb/0.png',
+    alt: 'Katacomb VPN welcome screen: a dotted world map of nodes beside a three-step Get started panel',
+    caption:
+      'Welcome: create or import a wallet, add P2P, then pick a node and connect.',
+    wide: true,
+  },
+  {
     src: 'img/katacomb/1.png',
     alt: 'Katacomb VPN map view: a 3D globe beside a country list with node counts',
     caption:
