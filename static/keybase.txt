@@ -1,33 +1,33 @@
 ==================================================================
-https://keybase.io/trinitystake
+https://keybase.io/proofoftrinity
 --------------------------------------------------------------------
 
 I hereby claim:
 
-  * I am an admin of https://trinitystake.io
-  * I am trinitystake (https://keybase.io/trinitystake) on keybase.
-  * I have a public key ASAO3ffn6CE7sTnaXrQSMJ0Uvv-wghOyQ7xiuUN1frosBgo
+  * I am an admin of https://proofoftrinity.github.io
+  * I am proofoftrinity (https://keybase.io/proofoftrinity) on keybase.
+  * I have a public key ASAZnzmSJtWaB2FGWN-Jugj05R_uCGliZ0KILNSoSIAr3Qo
 
 To do so, I am signing this object:
 
 {
   "body": {
     "key": {
-      "eldest_kid": "01200eddf7e7e8213bb139da5eb412309d14beffb08213b243bc62b943757eba2c060a",
+      "eldest_kid": "0120199f399226d59a07614658df89ba08f4e51fee0869626742882cd4a848802bdd0a",
       "host": "keybase.io",
-      "kid": "01200eddf7e7e8213bb139da5eb412309d14beffb08213b243bc62b943757eba2c060a",
-      "uid": "1fe9961ece90545bb92375f256f32219",
-      "username": "trinitystake"
+      "kid": "0120199f399226d59a07614658df89ba08f4e51fee0869626742882cd4a848802bdd0a",
+      "uid": "6bf2ee8de039405b6ffae292d2affa19",
+      "username": "proofoftrinity"
     },
     "merkle_root": {
-      "ctime": 1722088256,
-      "hash": "e07481525e4cad1214a657d3674e5cda48ab11c3a063f57ee7ec01c06f9ba78a514e6b1ee1acc72ea6e1057ec4df03b50704300bb1884cf795df3fb326e0a75c",
-      "hash_meta": "235f9322d855c37c8b17c550d2db87656dc0043b05225013c48295621f978362",
-      "seqno": 25956343
+      "ctime": 1792034175,
+      "hash": "a167ae1d2943a9c356598034464574878bcafe02e593949e3cef31c5aaf72cbd5ef61a4120485f8e59813351091a11c243d56f33ac9b85d8e6ab7f1ad369530a",
+      "hash_meta": "3b3cfd193782d2baf6e58b6beb173943b420bbbd911471acffe4653619b25a82",
+      "seqno": 27822462
     },
     "service": {
-      "entropy": "l1Gwbh40k01OMmn5KrsNKXAj",
-      "hostname": "trinitystake.io",
+      "entropy": "WJfKSU+OhJlUCC/lPfeYrROM",
+      "hostname": "proofoftrinity.github.io",
       "protocol": "https:"
     },
     "type": "web_service_binding",
@@ -35,22 +35,22 @@ To do so, I am signing this object:
   },
   "client": {
     "name": "keybase.io go client",
-    "version": "6.3.1"
+    "version": "6.6.3"
   },
-  "ctime": 1722088291,
+  "ctime": 1792034197,
   "expire_in": 504576000,
-  "prev": "4710ca8fe2caa353db0420084022e809d3c95d7cdb4383495bfd4e24da2fc257",
-  "seqno": 9,
+  "prev": "1388f7bc8682532b31cb3619ffa185ac0d1732498b6e5bc4d07f87413c821e86",
+  "seqno": 10,
   "tag": "signature"
 }
 
 which yields the signature:
 
-hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgDt335+ghO7E52l60EjCdFL7/sIITskO8YrlDdX66LAYKp3BheWxvYWTESpcCCcQgRxDKj+LKo1PbBCAIQCLoCdPJXXzbQ4NJW/1OJNovwlfEIDpd/gL+4U9YBwjsUdjekwBqsNkxdjSx9q2TejeXwp7cAgHCo3NpZ8RAyL4hBTEQL3sDZpWRz4/LgLZNTOOPqc9NHE/p4K6lE3jOhLTnFRL33T4I3gFPJiEuQjXTCnyFQ740tr0tYwI3BahzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIMnqxJbSWZgNY1mGdf2gaWza9GlpIFWx6Cr495jSQGXFo3RhZ80CAqd2ZXJzaW9uAQ==
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgGZ85kibVmgdhRljfiboI9OUf7ghpYmdCiCzUqEiAK90Kp3BheWxvYWTESpcCCsQgE4j3vIaCUysxyzYZ/6GFrA0XMkmLblvE0H+HQTyCHobEIAL0PsvId3S/r4i3CIFPCMCMwybY3U4LsYCin4tdOo5QAgHCo3NpZ8RAhF+0d5qkJkmW2Lgya1erEDlSdSz7RBtpKBoktmwnhqI0j7mIo8hp7FpYvMMHEM0fDP97Fh5pALeAT6f++h6HAahzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEICbGQsgjuGwuW2nwnomOZCseAGTPIF/eJmcQ/H5Ohjfeo3RhZ80CAqd2ZXJzaW9uAQ==
 
 And finally, I am proving ownership of this host by posting or
 appending to this document.
 
-View my publicly-auditable identity here: https://keybase.io/trinitystake
+View my publicly-auditable identity here: https://keybase.io/proofoftrinity
 
 ==================================================================
