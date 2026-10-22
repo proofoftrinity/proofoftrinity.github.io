@@ -65,3 +65,10 @@ export const ServerIcon = () => (
     <path d="M7 7.5h.01M7 16.5h.01" />
   </Icon>
 );
+
+export const MonitorIcon = () => (
+  <Icon>
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M8 20h8M12 16v4" />
+  </Icon>
+);

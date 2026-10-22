@@ -60,7 +60,7 @@ export default function Home() {
             <Card
               badge={`v${version}`}
               title="Katacomb VPN"
-              description="Our Linux desktop client for Sentinel. Pick a node anywhere in the world, pay for the session on-chain, and the tunnel comes up on any of six protocols. No accounts, no single provider."
+              description="Our desktop client for Sentinel, on Linux and Windows (beta). Pick a node anywhere in the world, pay for the session on-chain, and the tunnel comes up on any of six protocols. No accounts, no single provider."
               to="/katacomb-vpn"
               svgFile={katacombIcon}
             />

@@ -17,6 +17,7 @@ import {
   SplitIcon,
   KeyIcon,
   ServerIcon,
+  MonitorIcon,
 } from '../components/icons';
 
 const REPO = 'https://github.com/proofoftrinity/katacomb-vpn';
@@ -61,7 +62,7 @@ const PROTOCOLS = [
   ['V2Ray', 'sntl-tun', 'userspace + tun2socks', 'Bundled core; encrypted DNS over DoH'],
   ['OpenVPN', 'sntl-ovpn', 'root (openvpn)', "The node's PKI issues the client cert"],
   ['XRAY', 'sntl-tun', 'userspace + tun2socks', 'VLESS + Reality; bundled core'],
-  ['AmneziaWG', 'sntl0', 'root (awg-quick)', 'WireGuard fork with DPI-evasion params'],
+  ['AmneziaWG', 'sntl0', 'root (built into the helper)', 'WireGuard fork with DPI-evasion params'],
   ['Hysteria2', 'sntl-tun', 'userspace + tun2socks', 'QUIC; refuses to connect without a TLS pin'],
 ];
 
@@ -83,14 +84,14 @@ function Screenshot({src, alt, caption, wide}) {
 
 export default function KatacombVPN() {
   // Latest release, read from GitHub at build time.
-  const {version, deb, appimage, checksums, signature} =
+  const {version, deb, appimage, windows, checksums, signature} =
     usePluginData('katacomb-release');
   const iconUrl = useBaseUrl('img/katacomb.svg');
 
   return (
     <Layout
       title="Katacomb VPN"
-      description="A Linux desktop client for the Sentinel decentralized VPN network. Pick a node anywhere, pay for the session on-chain, and the tunnel comes up."
+      description="A Linux and Windows desktop client for the Sentinel decentralized VPN network. Pick a node anywhere, pay for the session on-chain, and the tunnel comes up."
       wrapperClassName="katacomb-page">
       {/* Layout only forwards title/description, so the page's own social
           card has to go through PageMetadata to override the site default. */}
@@ -120,12 +121,16 @@ export default function KatacombVPN() {
               <Link to={appimage.url} className="hero-cta-secondary">
                 AppImage
               </Link>
+              <Link to="#download" className="hero-cta-secondary">
+                Windows (beta)
+              </Link>
               <Link to={REPO} className="hero-cta-secondary">
                 Source
               </Link>
             </div>
             <ul className="app-meta" aria-label="Release details">
               <li className="app-meta__chip">Linux x86_64</li>
+              <li className="app-meta__chip">Windows 10/11 x64 (beta)</li>
               <li className="app-meta__chip">v{version}</li>
               <li className="app-meta__chip">GPL-3.0</li>
               <li className="app-meta__chip">Electron · React · TypeScript</li>
@@ -160,7 +165,7 @@ export default function KatacombVPN() {
             <Card
               icon={<ShieldIcon />}
               title="Kill switch"
-              description="iptables rules that drop everything outside the tunnel, armed on connect and torn down on disconnect. A self-healing marker repairs stranded rules if the app dies mid-connection."
+              description="Firewall rules that drop everything outside the tunnel: iptables on Linux, the Windows Filtering Platform on Windows. Armed on connect and torn down on disconnect, with a self-healing marker that repairs stranded rules if the app dies mid-connection."
             />
             <Card
               icon={<SplitIcon />}
@@ -170,7 +175,7 @@ export default function KatacombVPN() {
             <Card
               icon={<KeyIcon />}
               title="Wallet"
-              description="BIP-39 import or generate, multiple wallets, subaccounts at a chosen index. Seeds are encrypted at rest with the OS keyring, and if the keyring is unavailable, saving is refused rather than falling back to plaintext."
+              description="BIP-39 import or generate, multiple wallets, subaccounts at a chosen index. Seeds are encrypted at rest with the OS keyring on Linux and with Windows' own data protection (DPAPI) on Windows. If the keyring is unavailable, saving is refused rather than falling back to plaintext."
             />
             <Card
               icon={<ServerIcon />}
@@ -183,7 +188,7 @@ export default function KatacombVPN() {
             title="Protocols"
             className="section--flow"
             accentColor={ACCENT}
-            description="Each node runs exactly one. The client connects to all six and refuses only nodes advertising an unknown type.">
+            description="Each node runs exactly one. On Linux the client connects to all six and refuses only nodes advertising an unknown type. Windows has every protocol except OpenVPN.">
             <div className="proto-table-wrap">
               <table className="proto-table">
                 <thead>
@@ -214,9 +219,19 @@ export default function KatacombVPN() {
               have no equivalent for. Bundled binaries are SHA-256 pinned; both the
               app and the root daemon refuse to execute one whose hash doesn't match.
             </p>
+            <p className="table-footnote">
+              The table shows Linux. On Windows, every protocol runs through the
+              Katacomb VPN service, on Wintun adapters with the same names. OpenVPN
+              nodes are marked as unavailable in the node list, and the app refuses
+              them before anything is paid.
+            </p>
           </Section>
 
-          <Section id="download" title="Download" accentColor={ACCENT}>
+          <Section
+            id="download"
+            title="Download"
+            className="section--downloads"
+            accentColor={ACCENT}>
             <Card
               badge="Recommended"
               icon={<ShieldIcon />}
@@ -228,8 +243,15 @@ export default function KatacombVPN() {
               badge="Portable"
               icon={<ServerIcon />}
               title="AppImage"
-              description={`${appimage.name} · ${appimage.size} · No install step; each privileged action goes through pkexec. Needs FUSE 2 and libgbm1 from your system.`}
+              description={`${appimage.name} · ${appimage.size} · No install step; each privileged action goes through pkexec. Needs fusermount and libgbm1, which a stock desktop already has.`}
               to={appimage.url}
+            />
+            <Card
+              badge="Beta"
+              icon={<MonitorIcon />}
+              title="Windows 10 and 11"
+              description={`${windows.name} · ${windows.size} · x64. Installs the app and a small Windows service: one administrator prompt to install, then connecting never asks again. Every protocol except OpenVPN. Not code-signed yet, so SmartScreen warns; verify it first.`}
+              to={windows.url}
             />
             <Card
               icon={<GlobeIcon />}
@@ -242,7 +264,7 @@ export default function KatacombVPN() {
           <section className="verify-block" aria-labelledby="verify-heading">
             <h3 id="verify-heading">Verify what you downloaded</h3>
             <p>
-              Every release ships a <code>SHA256SUMS</code> covering both artifacts.
+              Every release ships a <code>SHA256SUMS</code> covering every artifact.
               Put it next to the download and check it:
             </p>
             <CodeBlock language="bash">
@@ -257,6 +279,14 @@ export default function KatacombVPN() {
             </p>
             <CodeBlock language="bash">
               gpg --verify SHA256SUMS.asc SHA256SUMS
+            </CodeBlock>
+            <p>
+              On Windows, PowerShell prints the installer's hash to compare with its
+              line in <code>SHA256SUMS</code>, and Gpg4win's <code>gpg</code> runs the
+              same <code>--verify</code>:
+            </p>
+            <CodeBlock language="powershell">
+              {`Get-FileHash .\\${windows.name}`}
             </CodeBlock>
             <p className="fingerprint">
               <span className="fingerprint__label">Signing key</span>
@@ -275,8 +305,17 @@ export default function KatacombVPN() {
             </h3>
             <ul>
               <li>
-                <strong>Linux x86_64 only.</strong> There is no Windows, macOS or
-                mobile build.
+                <strong>Linux x86_64, and Windows 10 and 11 on x64 as a beta.</strong>{' '}
+                There is no macOS or mobile build.
+              </li>
+              <li>
+                <strong>Windows is a beta.</strong> It was tested on Windows 11 only,
+                and multi-hop chains and local proxy mode have not been tried there
+                yet. OpenVPN nodes are not available, and only the account that ran
+                the installer can connect. The installer is not code-signed yet:
+                check it against <code>SHA256SUMS</code>, then at the SmartScreen
+                warning choose <strong>More info</strong> and{' '}
+                <strong>Run anyway</strong>.
               </li>
               <li>
                 <strong>Connecting spends real funds.</strong> A session is a
@@ -286,8 +325,8 @@ export default function KatacombVPN() {
                 is two sessions and two deposits.
               </li>
               <li>
-                <strong>Wallet storage needs an OS keyring.</strong> GNOME and KDE
-                ship one; on a bare XFCE or LXQt install, add{' '}
+                <strong>On Linux, wallet storage needs an OS keyring.</strong> GNOME
+                and KDE ship one; on a bare XFCE or LXQt install, add{' '}
                 <code>gnome-keyring</code>. A missing keyring means saving a wallet
                 is refused outright rather than silently falling back to weak
                 encryption.
@@ -316,8 +355,9 @@ export default function KatacombVPN() {
                 first, and anything not explicitly permitted is rejected, including
                 every OpenVPN directive that can run a script. The privileged helper
                 re-validates independently, because its socket is the real trust
-                boundary, and the renderer runs sandboxed with context isolation and
-                no Node access.
+                boundary. On Windows the same helper runs as a LocalSystem service
+                behind a named pipe, under the same rules. The renderer runs sandboxed
+                with context isolation and no Node access.
               </p>
               <p>
                 Payment order matters too: preflight checks run{' '}

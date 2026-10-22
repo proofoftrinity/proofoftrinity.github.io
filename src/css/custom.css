@@ -1009,6 +1009,11 @@ table th {
   display: block;
 }
 
+/* Four download cards sit two by two rather than leaving one alone on a row. */
+.section--downloads .section-content {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 /* Presentational cards have no destination, so no hover affordance. */
 .homepage-card--static {
   cursor: default;
@@ -1248,7 +1253,8 @@ table th {
 }
 
 @media screen and (max-width: 768px) {
-  .shot-grid {
+  .shot-grid,
+  .section--downloads .section-content {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 

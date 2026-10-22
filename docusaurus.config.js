@@ -194,7 +194,8 @@ const config = {
           'yaml',
           'python',
           'markdown',
-          'toml'
+          'toml',
+          'powershell'
         ],
       },
     }),

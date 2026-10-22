@@ -4,21 +4,26 @@ const RELEASES = `https://github.com/${REPO}/releases`;
 // Used when the GitHub API can't be reached, so an offline or rate-limited
 // build still produces a working page instead of failing.
 const FALLBACK = {
-  version: '1.17.1',
+  version: '1.18.0',
   stale: true,
-  releaseUrl: `${RELEASES}/tag/v1.17.1`,
+  releaseUrl: `${RELEASES}/tag/v1.18.0`,
   deb: {
-    name: 'katacomb-vpn_1.17.1_amd64.deb',
-    url: `${RELEASES}/download/v1.17.1/katacomb-vpn_1.17.1_amd64.deb`,
+    name: 'katacomb-vpn_1.18.0_amd64.deb',
+    url: `${RELEASES}/download/v1.18.0/katacomb-vpn_1.18.0_amd64.deb`,
     size: '113 MB',
   },
   appimage: {
-    name: 'katacomb-vpn-1.17.1.AppImage',
-    url: `${RELEASES}/download/v1.17.1/katacomb-vpn-1.17.1.AppImage`,
+    name: 'katacomb-vpn-1.18.0.AppImage',
+    url: `${RELEASES}/download/v1.18.0/katacomb-vpn-1.18.0.AppImage`,
     size: '132 MB',
   },
-  checksums: `${RELEASES}/download/v1.17.1/SHA256SUMS`,
-  signature: `${RELEASES}/download/v1.17.1/SHA256SUMS.asc`,
+  windows: {
+    name: 'katacomb-vpn-1.18.0-setup.exe',
+    url: `${RELEASES}/download/v1.18.0/katacomb-vpn-1.18.0-setup.exe`,
+    size: '114 MB',
+  },
+  checksums: `${RELEASES}/download/v1.18.0/SHA256SUMS`,
+  signature: `${RELEASES}/download/v1.18.0/SHA256SUMS.asc`,
 };
 
 const megabytes = (bytes) =>
@@ -66,8 +71,11 @@ module.exports = function katacombRelease() {
         const assets = Array.isArray(release.assets) ? release.assets : [];
         const deb = pick(assets, (n) => n.endsWith('.deb'));
         const appimage = pick(assets, (n) => n.endsWith('.AppImage'));
-        if (!deb || !appimage) {
-          throw new Error(`release ${version} is missing a .deb or AppImage`);
+        const windows = pick(assets, (n) => n.endsWith('-setup.exe'));
+        if (!deb || !appimage || !windows) {
+          throw new Error(
+            `release ${version} is missing a .deb, AppImage or Windows installer`,
+          );
         }
 
         const asset = (name) =>
@@ -80,6 +88,7 @@ module.exports = function katacombRelease() {
           releaseUrl: release.html_url ?? `${RELEASES}/tag/v${version}`,
           deb,
           appimage,
+          windows,
           checksums: asset('SHA256SUMS') ?? FALLBACK.checksums,
           signature: asset('SHA256SUMS.asc') ?? FALLBACK.signature,
         };
