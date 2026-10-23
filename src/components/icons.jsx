@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Minimal stroke icons for feature cards, in the same style as the card
+// Minimal stroke icons for cards and controls, in the same style as the card
 // chevron in HomepageComponents.jsx: 24px viewBox, currentColor, 1.5 stroke.
 
 const Icon = ({children}) => (
@@ -66,9 +66,44 @@ export const ServerIcon = () => (
   </Icon>
 );
 
-export const MonitorIcon = () => (
+export const DownloadIcon = () => (
   <Icon>
-    <rect x="3" y="4" width="18" height="12" rx="2" />
-    <path d="M8 20h8M12 16v4" />
+    <path d="M12 4v11" />
+    <path d="M7 10l5 5l5-5" />
+    <path d="M5 20h14" />
+  </Icon>
+);
+
+export const ExpandIcon = () => (
+  <Icon>
+    <path d="M15 4h5v5" />
+    <path d="M9 20H4v-5" />
+    <path d="M20 4l-6 6" />
+    <path d="M4 20l6-6" />
+  </Icon>
+);
+
+export const CloseIcon = () => (
+  <Icon>
+    <path d="M6 6l12 12" />
+    <path d="M18 6L6 18" />
+  </Icon>
+);
+
+export const ChevronLeftIcon = () => (
+  <Icon>
+    <path d="M15 5l-7 7l7 7" />
+  </Icon>
+);
+
+export const ChevronRightIcon = () => (
+  <Icon>
+    <path d="M9 5l7 7l-7 7" />
+  </Icon>
+);
+
+export const CheckIcon = () => (
+  <Icon>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
   </Icon>
 );

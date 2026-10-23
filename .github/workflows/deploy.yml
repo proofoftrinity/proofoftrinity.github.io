@@ -7,10 +7,10 @@ on:
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 
-  # The Katacomb VPN version and download links are read from the GitHub API
-  # when the site builds, so a rebuild is what picks up a new release. Daily
-  # keeps the site at most a day behind; the deploy step skips when the build
-  # output is unchanged. Run it by hand after a release to update immediately.
+  # The Katacomb pages ask GitHub for the latest release in the browser, so a
+  # new release shows up without a rebuild. The daily build also bakes it into
+  # the static HTML that search engines and visitors without JavaScript get;
+  # the deploy step skips when the build output is unchanged.
   schedule:
     - cron: '0 5 * * *'
   workflow_dispatch:
@@ -35,6 +35,10 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+        env:
+          # Lets the build read the latest Katacomb release as this workflow
+          # rather than anonymously, so it can't be rate limited.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Popular action to deploy to GitHub Pages:
       # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus

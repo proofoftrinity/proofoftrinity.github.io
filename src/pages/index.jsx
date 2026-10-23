@@ -2,18 +2,18 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import {usePluginData} from '@docusaurus/useGlobalData';
 
 import {
   HomepageCard as Card,
   HomepageSection as Section,
 } from '../components/HomepageComponents';
+import useKatacombRelease from '../components/useKatacombRelease';
 
 const VALIDATOR_URL =
   'https://p2pscan.com/validator/sentvaloper1mcwvu4vpvfcnxduzpelehmgga282wtc0xux7se';
 
 export default function Home() {
-  const {version} = usePluginData('katacomb-release');
+  const {version} = useKatacombRelease();
   const trinityIcon = useBaseUrl('img/trinity.svg');
   const sentinelIcon = useBaseUrl('img/sentinel.svg');
   const katacombIcon = useBaseUrl('img/katacomb.svg');
@@ -58,7 +58,7 @@ export default function Home() {
               svgFile={trinityIcon}
             />
             <Card
-              badge={`v${version}`}
+              badge={version && `v${version}`}
               title="Katacomb VPN"
               description="Our desktop client for Sentinel, on Linux and Windows (beta). Pick a node anywhere in the world, pay for the session on-chain, and the tunnel comes up on any of six protocols. No accounts, no single provider."
               to="/katacomb-vpn"

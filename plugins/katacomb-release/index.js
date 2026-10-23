@@ -1,47 +1,11 @@
-const REPO = 'proofoftrinity/katacomb-vpn';
-const RELEASES = `https://github.com/${REPO}/releases`;
-
-// Used when the GitHub API can't be reached, so an offline or rate-limited
-// build still produces a working page instead of failing.
-const FALLBACK = {
-  version: '1.18.0',
-  stale: true,
-  releaseUrl: `${RELEASES}/tag/v1.18.0`,
-  deb: {
-    name: 'katacomb-vpn_1.18.0_amd64.deb',
-    url: `${RELEASES}/download/v1.18.0/katacomb-vpn_1.18.0_amd64.deb`,
-    size: '113 MB',
-  },
-  appimage: {
-    name: 'katacomb-vpn-1.18.0.AppImage',
-    url: `${RELEASES}/download/v1.18.0/katacomb-vpn-1.18.0.AppImage`,
-    size: '132 MB',
-  },
-  windows: {
-    name: 'katacomb-vpn-1.18.0-setup.exe',
-    url: `${RELEASES}/download/v1.18.0/katacomb-vpn-1.18.0-setup.exe`,
-    size: '114 MB',
-  },
-  checksums: `${RELEASES}/download/v1.18.0/SHA256SUMS`,
-  signature: `${RELEASES}/download/v1.18.0/SHA256SUMS.asc`,
-};
-
-const megabytes = (bytes) =>
-  typeof bytes === 'number' && bytes > 0
-    ? `${Math.round(bytes / 1024 / 1024)} MB`
-    : undefined;
-
-const pick = (assets, test) => {
-  const asset = assets.find((a) => test(a.name ?? ''));
-  return asset
-    ? {name: asset.name, url: asset.browser_download_url, size: megabytes(asset.size)}
-    : undefined;
-};
+const {LATEST_API, UNKNOWN, parseRelease} = require('./release');
 
 /**
  * Reads the latest Katacomb VPN release at build time so the version, the
  * download links and the artifact sizes on the site follow GitHub instead of
- * being edited by hand after every release.
+ * being edited by hand after every release. The pages check GitHub again in
+ * the browser (src/components/useKatacombRelease.js), so a release published
+ * after the build still reaches visitors straight away.
  */
 module.exports = function katacombRelease() {
   return {
@@ -49,55 +13,45 @@ module.exports = function katacombRelease() {
 
     async loadContent() {
       try {
-        const response = await fetch(
-          `https://api.github.com/repos/${REPO}/releases/latest`,
-          {
-            headers: {
-              Accept: 'application/vnd.github+json',
-              'User-Agent': 'proofoftrinity-website-build',
-            },
-          },
-        );
+        const headers = {
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'proofoftrinity-website-build',
+        };
+        // CI passes the workflow's token so a shared runner IP can't get the
+        // build rate limited. Anonymous requests work too, just with less room.
+        if (process.env.GITHUB_TOKEN) {
+          headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+        }
+
+        const response = await fetch(LATEST_API, {
+          headers,
+          signal: AbortSignal.timeout(15000),
+        });
         if (!response.ok) {
           throw new Error(`GitHub API responded ${response.status}`);
         }
 
-        const release = await response.json();
-        const version = String(release.tag_name ?? '').replace(/^v/, '');
-        if (!/^\d+\.\d+\.\d+/.test(version)) {
-          throw new Error(`unexpected tag name ${release.tag_name}`);
-        }
-
-        const assets = Array.isArray(release.assets) ? release.assets : [];
-        const deb = pick(assets, (n) => n.endsWith('.deb'));
-        const appimage = pick(assets, (n) => n.endsWith('.AppImage'));
-        const windows = pick(assets, (n) => n.endsWith('-setup.exe'));
-        if (!deb || !appimage || !windows) {
-          throw new Error(
-            `release ${version} is missing a .deb, AppImage or Windows installer`,
+        const release = parseRelease(await response.json());
+        const missing = ['deb', 'appimage', 'windows'].filter(
+          (build) => !release[build].name,
+        );
+        if (missing.length > 0) {
+          console.warn(
+            `[katacomb-release] v${release.version} has no ${missing.join(', ')} ` +
+              'asset; those downloads link to the release page',
           );
         }
 
-        const asset = (name) =>
-          assets.find((a) => a.name === name)?.browser_download_url;
-
-        console.log(`[katacomb-release] using v${version} from GitHub`);
-        return {
-          version,
-          stale: false,
-          releaseUrl: release.html_url ?? `${RELEASES}/tag/v${version}`,
-          deb,
-          appimage,
-          windows,
-          checksums: asset('SHA256SUMS') ?? FALLBACK.checksums,
-          signature: asset('SHA256SUMS.asc') ?? FALLBACK.signature,
-        };
+        console.log(`[katacomb-release] using v${release.version} from GitHub`);
+        return release;
       } catch (error) {
+        // Never fail the build over this. The links go to GitHub's latest
+        // release page, and the browser fills in the version on load.
         console.warn(
           `[katacomb-release] could not read the latest release (${error.message}); ` +
-            `falling back to v${FALLBACK.version}`,
+            'linking to the latest release page instead',
         );
-        return FALLBACK;
+        return UNKNOWN;
       }
     },
 

@@ -1,15 +1,17 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import clsx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import CodeBlock from '@theme/CodeBlock';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import {usePluginData} from '@docusaurus/useGlobalData';
 import {PageMetadata} from '@docusaurus/theme-common';
 
 import {
   HomepageCard as Card,
   HomepageSection as Section,
 } from '../components/HomepageComponents';
+import KatacombDownload from '../components/KatacombDownload';
+import ScreenshotGallery from '../components/ScreenshotGallery';
+import useKatacombRelease from '../components/useKatacombRelease';
 import {
   GlobeIcon,
   RouteIcon,
@@ -17,75 +19,87 @@ import {
   SplitIcon,
   KeyIcon,
   ServerIcon,
-  MonitorIcon,
+  CheckIcon,
 } from '../components/icons';
 
 const REPO = 'https://github.com/proofoftrinity/katacomb-vpn';
-
-// Fingerprint of the key the release checksums are signed with. Published here
-// so it reaches you over a different channel than the binaries themselves.
-const SIGNING_KEY = '740A F267 B0D8 162B E477  779D 7315 246A 6E67 F3C6';
 
 // Warm accent taken from the app's own icon. The site stays blue; the
 // product section reads as the product.
 const ACCENT = '#e1bc99';
 
+// Gallery order. `label` names the tab, so the caption doesn't repeat it.
 const SHOTS = [
   {
     src: 'img/katacomb/0.png',
+    label: 'Welcome',
     alt: 'Katacomb VPN welcome screen: a dotted world map of nodes beside a three-step Get started panel',
-    caption:
-      'Welcome: create or import a wallet, add P2P, then pick a node and connect.',
+    caption: 'Create or import a wallet, add P2P, then pick a node and connect.',
   },
   {
     src: 'img/katacomb/1.png',
+    label: 'Map',
     alt: 'Katacomb VPN map view: a 3D globe beside a country list with node counts',
     caption:
-      'Map: a 3D globe with per-country node counts, and the live network size in the corner.',
+      'A 3D globe with per-country node counts, and the live network size in the corner.',
   },
   {
     src: 'img/katacomb/2.png',
+    label: 'Nodes',
     alt: 'Katacomb VPN node table listing country, city, moniker, protocol and price',
     caption:
-      'Nodes: the whole network in one sortable table, with per-GB and per-hour prices.',
+      'The whole network in one sortable table, with per-GB and per-hour prices.',
   },
   {
     src: 'img/katacomb/3.png',
+    label: 'Multi-hop',
     alt: 'Katacomb VPN multi-hop view showing entry and exit node selection',
     caption:
-      'Multi-hop: pick an entry and an exit. Only nodes that can actually be chained are offered.',
+      'Pick an entry and an exit. Only nodes that can actually be chained are offered.',
   },
 ];
 
+// `iface` and `runs` describe Linux; the footnote under the table covers
+// Windows. Every protocol runs on Linux.
 const PROTOCOLS = [
-  ['WireGuard', 'sntl0', 'root (wg-quick)', 'Uses the distro wireguard-tools'],
-  ['V2Ray', 'sntl-tun', 'userspace + tun2socks', 'Bundled core; encrypted DNS over DoH'],
-  ['OpenVPN', 'sntl-ovpn', 'root (openvpn)', "The node's PKI issues the client cert"],
-  ['XRAY', 'sntl-tun', 'userspace + tun2socks', 'VLESS + Reality; bundled core'],
-  ['AmneziaWG', 'sntl0', 'root (built into the helper)', 'WireGuard fork with DPI-evasion params'],
-  ['Hysteria2', 'sntl-tun', 'userspace + tun2socks', 'QUIC; refuses to connect without a TLS pin'],
+  {name: 'WireGuard', iface: 'sntl0', runs: 'root (wg-quick)', notes: 'Uses the distro wireguard-tools', windows: true, multihop: false},
+  {name: 'V2Ray', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'Bundled core; encrypted DNS over DoH', windows: true, multihop: true},
+  {name: 'OpenVPN', iface: 'sntl-ovpn', runs: 'root (openvpn)', notes: "The node's PKI issues the client cert", windows: false, multihop: false},
+  {name: 'XRAY', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'VLESS + Reality; bundled core', windows: true, multihop: true},
+  {name: 'AmneziaWG', iface: 'sntl0', runs: 'root (built into the helper)', notes: 'WireGuard fork with DPI-evasion params', windows: true, multihop: false},
+  {name: 'Hysteria2', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'QUIC; refuses to connect without a TLS pin', windows: true, multihop: false},
 ];
 
-function Screenshot({src, alt, caption, wide}) {
-  const url = useBaseUrl(src);
+// The visitor's system, read only after hydration so the static HTML is the
+// same for everyone. Android and ChromeOS report Linux but can't run these.
+function useVisitorOS() {
+  const [os, setOS] = useState(null);
+  useEffect(() => {
+    const platform = `${navigator.userAgentData?.platform ?? ''} ${navigator.userAgent}`;
+    if (/windows/i.test(platform)) {
+      setOS('windows');
+    } else if (/linux|x11/i.test(platform) && !/android|cros/i.test(platform)) {
+      setOS('linux');
+    }
+  }, []);
+  return os;
+}
+
+// A yes/no cell in the protocol table: a tick or a dash on screen, a word for
+// screen readers.
+function Supported({yes}) {
   return (
-    <figure className={wide ? 'shot shot--wide' : 'shot'}>
-      <a
-        href={url}
-        className="shot-link"
-        target="_blank"
-        rel="noopener noreferrer">
-        <img src={url} alt={alt} loading="lazy" width="1280" height="832" />
-      </a>
-      <figcaption>{caption}</figcaption>
-    </figure>
+    <td className={clsx('proto-table__flag', !yes && 'proto-table__flag--no')}>
+      {yes ? <CheckIcon /> : <span aria-hidden="true">&mdash;</span>}
+      <span className="visually-hidden">{yes ? 'Yes' : 'No'}</span>
+    </td>
   );
 }
 
 export default function KatacombVPN() {
-  // Latest release, read from GitHub at build time.
-  const {version, deb, appimage, windows, checksums, signature} =
-    usePluginData('katacomb-release');
+  // Latest release: read from GitHub at build time, then again in the browser.
+  const release = useKatacombRelease();
+  const os = useVisitorOS();
   const iconUrl = useBaseUrl('img/katacomb.svg');
 
   return (
@@ -106,49 +120,30 @@ export default function KatacombVPN() {
                 Katacomb VPN
               </span>
             </h1>
+            <p className="hero-tagline">Pick a node anywhere. Pay on-chain. Connect.</p>
             <p className="hero-subtitle">
-              A desktop client for the Sentinel decentralized VPN network. Pick a
-              node anywhere in the world, pay for a session on-chain, and Katacomb
-              brings up the tunnel on WireGuard, AmneziaWG, OpenVPN, V2Ray, XRAY or
-              Hysteria2, whichever that node speaks. No accounts, no subscription to
-              a single provider: bandwidth is bought directly from independent node
-              operators with a wallet you hold the keys to.
+              A desktop client for the Sentinel decentralized VPN network. No
+              accounts and no single provider: you pay independent node operators
+              directly, from a wallet you hold the keys to.
             </p>
-            <div className="hero-actions">
-              <Link to={deb.url} className="hero-cta-primary">
-                Download .deb <span aria-hidden="true">&darr;</span>
-              </Link>
-              <Link to={appimage.url} className="hero-cta-secondary">
-                AppImage
-              </Link>
-              <Link to="#download" className="hero-cta-secondary">
-                Windows (beta)
-              </Link>
-              <Link to={REPO} className="hero-cta-secondary">
-                Source
-              </Link>
-            </div>
-            <ul className="app-meta" aria-label="Release details">
-              <li className="app-meta__chip">Linux x86_64</li>
-              <li className="app-meta__chip">Windows 10/11 x64 (beta)</li>
-              <li className="app-meta__chip">v{version}</li>
-              <li className="app-meta__chip">GPL-3.0</li>
-              <li className="app-meta__chip">Electron · React · TypeScript</li>
+            <ul className="hero-protocols" aria-label="Protocols">
+              {PROTOCOLS.map(({name}) => (
+                <li key={name}>{name}</li>
+              ))}
             </ul>
+            <KatacombDownload release={release} os={os} />
           </section>
 
           <Section
+            id="screenshots"
             title="A look inside"
             className="section--flow"
             accentColor={ACCENT}>
-            <div className="shot-grid">
-              {SHOTS.map((shot) => (
-                <Screenshot key={shot.src} {...shot} />
-              ))}
-            </div>
+            <ScreenshotGallery shots={SHOTS} />
           </Section>
 
           <Section
+            id="features"
             title="What it does"
             accentColor={ACCENT}
             description="Everything runs locally against the chain. There is no Trinity server in the path.">
@@ -160,7 +155,7 @@ export default function KatacombVPN() {
             <Card
               icon={<RouteIcon />}
               title="Multi-hop"
-              description="Chain two nodes so the entry sees your IP but not where you go, and the exit sees where you go but not your IP. Candidates are checked against each node's advertised inbounds before anything is paid for, and the two hops can be paid from separate wallets."
+              description="Chain two nodes so the entry sees your IP but not where you go, and the exit sees where you go but not your IP. Candidates are checked against each node's advertised inbounds before anything is paid for, and the exit is paid from a second wallet."
             />
             <Card
               icon={<ShieldIcon />}
@@ -185,24 +180,31 @@ export default function KatacombVPN() {
           </Section>
 
           <Section
+            id="protocols"
             title="Protocols"
             className="section--flow"
             accentColor={ACCENT}
-            description="Each node runs exactly one. On Linux the client connects to all six and refuses only nodes advertising an unknown type. Windows has every protocol except OpenVPN.">
+            description="Each node runs exactly one. On Linux the client connects to all six and refuses only nodes advertising an unknown type.">
             <div className="proto-table-wrap">
               <table className="proto-table">
                 <thead>
                   <tr>
                     <th scope="col">Protocol</th>
+                    <th scope="col" className="proto-table__flag">Linux</th>
+                    <th scope="col" className="proto-table__flag">Windows</th>
+                    <th scope="col" className="proto-table__flag">Multi-hop</th>
                     <th scope="col">Interface</th>
                     <th scope="col">How it runs</th>
                     <th scope="col">Notes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {PROTOCOLS.map(([name, iface, runs, notes]) => (
+                  {PROTOCOLS.map(({name, iface, runs, notes, windows: onWindows, multihop}) => (
                     <tr key={name}>
                       <th scope="row">{name}</th>
+                      <Supported yes />
+                      <Supported yes={onWindows} />
+                      <Supported yes={multihop} />
                       <td>
                         <code>{iface}</code>
                       </td>
@@ -214,181 +216,91 @@ export default function KatacombVPN() {
               </table>
             </div>
             <p className="table-footnote">
-              Multi-hop chains only work on V2Ray and XRAY. The mechanism is
-              v2ray-core's <code>proxySettings.tag</code>, which the other protocols
-              have no equivalent for. Bundled binaries are SHA-256 pinned; both the
-              app and the root daemon refuse to execute one whose hash doesn't match.
+              Multi-hop chains are built on v2ray-core's{' '}
+              <code>proxySettings.tag</code>, which the other protocols have no
+              equivalent for. Bundled binaries are SHA-256 pinned; both the app and
+              the root daemon refuse to execute one whose hash doesn't match.
             </p>
             <p className="table-footnote">
-              The table shows Linux. On Windows, every protocol runs through the
-              Katacomb VPN service, on Wintun adapters with the same names. OpenVPN
-              nodes are marked as unavailable in the node list, and the app refuses
-              them before anything is paid.
+              Interface and How it runs are for Linux. On Windows, every protocol
+              runs through the Katacomb VPN service, on Wintun adapters with the same
+              names. OpenVPN nodes are marked as unavailable in the node list there,
+              and the app refuses them before anything is paid.
             </p>
           </Section>
 
           <Section
-            id="download"
-            title="Download"
-            className="section--downloads"
-            accentColor={ACCENT}>
-            <Card
-              badge="Recommended"
-              icon={<ShieldIcon />}
-              title="Debian and Ubuntu"
-              description={`${deb.name} · ${deb.size} · Debian 11+, Ubuntu 20.04+ and derivatives. Installs a small root daemon, so connecting and disconnecting never prompt for a password, and declares its dependencies properly.`}
-              to={deb.url}
-            />
-            <Card
-              badge="Portable"
-              icon={<ServerIcon />}
-              title="AppImage"
-              description={`${appimage.name} · ${appimage.size} · No install step; each privileged action goes through pkexec. Needs fusermount and libgbm1, which a stock desktop already has.`}
-              to={appimage.url}
-            />
-            <Card
-              badge="Beta"
-              icon={<MonitorIcon />}
-              title="Windows 10 and 11"
-              description={`${windows.name} · ${windows.size} · x64. Installs the app and a small Windows service: one administrator prompt to install, then connecting never asks again. Every protocol except OpenVPN. Not code-signed yet, so SmartScreen warns; verify it first.`}
-              to={windows.url}
-            />
-            <Card
-              icon={<GlobeIcon />}
-              title="All releases"
-              description="Previous versions, release notes and the full asset list on GitHub."
-              to={`${REPO}/releases`}
-            />
-          </Section>
-
-          <section className="verify-block" aria-labelledby="verify-heading">
-            <h3 id="verify-heading">Verify what you downloaded</h3>
-            <p>
-              Every release ships a <code>SHA256SUMS</code> covering every artifact.
-              Put it next to the download and check it:
-            </p>
-            <CodeBlock language="bash">
-              sha256sum -c SHA256SUMS --ignore-missing
-            </CodeBlock>
-            <p>
-              A checksum on its own only proves the file arrived intact. Anyone who
-              can replace the download can replace the checksums with it. It means
-              something when the checksums reach you from somewhere the binaries
-              don't, which is the point of listing the signing key on this page
-              rather than only on the release:
-            </p>
-            <CodeBlock language="bash">
-              gpg --verify SHA256SUMS.asc SHA256SUMS
-            </CodeBlock>
-            <p>
-              On Windows, PowerShell prints the installer's hash to compare with its
-              line in <code>SHA256SUMS</code>, and Gpg4win's <code>gpg</code> runs the
-              same <code>--verify</code>:
-            </p>
-            <CodeBlock language="powershell">
-              {`Get-FileHash .\\${windows.name}`}
-            </CodeBlock>
-            <p className="fingerprint">
-              <span className="fingerprint__label">Signing key</span>
-              <code>{SIGNING_KEY}</code>
-            </p>
-            <p className="verify-links">
-              <Link to={checksums}>SHA256SUMS</Link>
-              <Link to={signature}>Signature</Link>
-              <Link to="https://keybase.io/trinitystake">Keybase identity</Link>
-            </p>
-          </section>
-
-          <section className="notice notice--warn" aria-labelledby="before-heading">
-            <h3 id="before-heading" className="notice__title">
-              Before you install
-            </h3>
-            <ul>
-              <li>
-                <strong>Linux x86_64, and Windows 10 and 11 on x64 as a beta.</strong>{' '}
-                There is no macOS or mobile build.
-              </li>
-              <li>
-                <strong>Windows is a beta.</strong> It was tested on Windows 11 only,
-                and multi-hop chains and local proxy mode have not been tried there
-                yet. OpenVPN nodes are not available, and only the account that ran
-                the installer can connect. The installer is not code-signed yet:
-                check it against <code>SHA256SUMS</code>, then at the SmartScreen
-                warning choose <strong>More info</strong> and{' '}
-                <strong>Run anyway</strong>.
-              </li>
-              <li>
-                <strong>Connecting spends real funds.</strong> A session is a
-                blockchain transaction priced in <code>udvpn</code> and paid to the
-                node operator. Failures on the client side are refunded
-                automatically; a session you actually used is not. A multi-hop chain
-                is two sessions and two deposits.
-              </li>
-              <li>
-                <strong>On Linux, wallet storage needs an OS keyring.</strong> GNOME
-                and KDE ship one; on a bare XFCE or LXQt install, add{' '}
-                <code>gnome-keyring</code>. A missing keyring means saving a wallet
-                is refused outright rather than silently falling back to weak
-                encryption.
-              </li>
-              <li>
-                <strong>On Ubuntu 24.04+, prefer the .deb.</strong> With
-                unprivileged user namespaces restricted, the AppImage starts with
-                Chromium's sandbox disabled. The <code>.deb</code> installs the
-                AppArmor profile that keeps it on.
-              </li>
-            </ul>
-          </section>
-
-          <Section
+            id="security"
             title="Security model"
             className="section--flow"
             accentColor={ACCENT}>
-            <div className="app-prose">
-              <p>
-                The design assumption worth stating plainly:{' '}
-                <strong>node operators are treated as adversaries.</strong> Their
-                handshake data turns into configs that <code>wg-quick</code>,{' '}
-                <code>openvpn</code> and <code>iptables</code> execute as root, and a
-                single <code>PostUp</code> line in a WireGuard config is a root
-                shell. So every node-supplied config passes an allow-list validator
-                first, and anything not explicitly permitted is rejected, including
-                every OpenVPN directive that can run a script. The privileged helper
-                re-validates independently, because its socket is the real trust
-                boundary. On Windows the same helper runs as a LocalSystem service
-                behind a named pipe, under the same rules. The renderer runs sandboxed
-                with context isolation and no Node access.
-              </p>
-              <p>
-                Payment order matters too: preflight checks run{' '}
-                <em>before</em> the session is paid for, and a failure during the
-                handshake or validation cancels the session and refunds it.
-              </p>
-              <p>
-                <strong>What multi-hop does not do.</strong> It protects against one
-                dishonest node: with two hops, neither end holds both your identity
-                and your destinations. It does not make you anonymous. Two operators
-                working together can still correlate the circuit on traffic volume
-                and timing, since the same bytes cross both hops at the same moments.
-                That is a hard ceiling, not something a client can close.
-              </p>
-              <p>
-                The full model, including the invariants that must not regress, is in
-                the repository.
-              </p>
+            <p className="security-lead">
+              <strong>Node operators are treated as adversaries.</strong> Their
+              handshake data turns into configs that <code>wg-quick</code>,{' '}
+              <code>openvpn</code> and <code>iptables</code> execute as root, and a
+              single <code>PostUp</code> line in a WireGuard config is a root shell.
+            </p>
+            <div className="security-grid">
+              <article className="security-card">
+                <h4>Every config is checked twice</h4>
+                <p>
+                  Every node-supplied config passes an allow-list validator first, and
+                  anything not explicitly permitted is rejected, including every
+                  OpenVPN directive that can run a script. The privileged helper
+                  re-validates independently, because its socket is the real trust
+                  boundary. On Windows the same helper runs as a LocalSystem service
+                  behind a named pipe, under the same rules. The renderer runs
+                  sandboxed with context isolation and no Node access.
+                </p>
+              </article>
+              <div className="security-stack">
+                <article className="security-card">
+                  <h4>Paying for a session</h4>
+                  <p>
+                    Connecting spends real funds: a session is a blockchain
+                    transaction priced in <code>udvpn</code> and paid to the node
+                    operator. Preflight checks run <em>before</em> it is paid for, and
+                    a failure on the client side, during the handshake or validation,
+                    cancels the session and refunds it automatically. A session you
+                    actually used is not refunded. A multi-hop chain is two sessions
+                    and two deposits.
+                  </p>
+                </article>
+                <article className="security-card">
+                  <h4>What multi-hop does not do</h4>
+                  <p>
+                    It protects against one dishonest node: with two hops, neither end
+                    holds both your identity and your destinations. It does not make
+                    you anonymous. Two operators working together can still correlate
+                    the circuit on traffic volume and timing, since the same bytes
+                    cross both hops at the same moments. That is a hard ceiling, not
+                    something a client can close.
+                  </p>
+                </article>
+              </div>
             </div>
+            <p className="security-more">
+              The full model, including the invariants that must not regress, is in
+              the repository.{' '}
+              <Link to={`${REPO}#security-model`}>
+                Read the security model <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </p>
           </Section>
 
-          <div className="hero-actions app-footer-actions">
-            <Link to={REPO} className="hero-cta-primary">
-              Read the source <span aria-hidden="true">&rarr;</span>
-            </Link>
-            <Link to={`${REPO}/issues`} className="hero-cta-secondary">
-              Report an issue
-            </Link>
-            <Link to={`${REPO}/blob/main/LICENSE`} className="hero-cta-secondary">
-              GPL-3.0 license
-            </Link>
+          <div className="app-footer">
+            <p className="app-footer__note">Built with Electron, React and TypeScript.</p>
+            <div className="hero-actions">
+              <Link to={REPO} className="hero-cta-primary">
+                Read the source <span aria-hidden="true">&rarr;</span>
+              </Link>
+              <Link to={`${REPO}/issues`} className="hero-cta-secondary">
+                Report an issue
+              </Link>
+              <Link to={`${REPO}/blob/main/LICENSE`} className="hero-cta-secondary">
+                GPL-3.0 license
+              </Link>
+            </div>
           </div>
         </div>
       </div>
