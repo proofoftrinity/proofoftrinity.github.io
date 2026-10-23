@@ -14,6 +14,11 @@ const RELEASES = 'https://github.com/proofoftrinity/katacomb-vpn/releases';
 // so it reaches you over a different channel than the binaries themselves.
 const SIGNING_KEY = '740A F267 B0D8 162B E477  779D 7315 246A 6E67 F3C6';
 
+// Where the public half of that key is served. gpg fetches it itself, so the
+// same line works in a Linux shell and in PowerShell.
+const KEYBASE = 'https://keybase.io/proofoftrinity';
+const FETCH_KEY = `gpg --fetch-keys ${KEYBASE}/pgp_keys.asc`;
+
 // Fixed locale and time zone, so the build and the browser print the same
 // date and hydration doesn't trip over it.
 const RELEASE_DATE = new Intl.DateTimeFormat('en-GB', {
@@ -27,10 +32,12 @@ const LINUX_CHECK = {
   intro: (
     <>
       Put <code>SHA256SUMS</code> and <code>SHA256SUMS.asc</code> next to the
-      download, then check the file and the signature:
+      download. Import the signing key once, then check the file and the
+      signature:
     </>
   ),
-  code: () => 'sha256sum -c SHA256SUMS --ignore-missing\ngpg --verify SHA256SUMS.asc SHA256SUMS',
+  code: () =>
+    `${FETCH_KEY}\nsha256sum -c SHA256SUMS --ignore-missing\ngpg --verify SHA256SUMS.asc SHA256SUMS`,
 };
 
 const KEYRING = (
@@ -112,12 +119,13 @@ const BUILDS = [
     check: {
       intro: (
         <>
-          In PowerShell, print the installer's hash and compare it with its line in{' '}
-          <code>SHA256SUMS</code>, then check the signature with Gpg4win's{' '}
-          <code>gpg</code>:
+          In PowerShell, import the signing key once with Gpg4win's{' '}
+          <code>gpg</code>. Then print the installer's hash, compare it with its
+          line in <code>SHA256SUMS</code>, and check the signature:
         </>
       ),
-      code: (file) => `Get-FileHash .\\${file}\ngpg --verify SHA256SUMS.asc SHA256SUMS`,
+      code: (file) =>
+        `${FETCH_KEY}\nGet-FileHash .\\${file}\ngpg --verify SHA256SUMS.asc SHA256SUMS`,
     },
     install: {
       intro: (
@@ -170,8 +178,11 @@ function Build({build, asset, release, open, onToggle}) {
             <p>
               A checksum only proves the file arrived intact: anyone who can replace
               the download can replace the checksums with it. The signature is what
-              makes it mean something, which is why the key is listed here rather
-              than only on the release.
+              makes it mean something, which is why the key's fingerprint is listed
+              here rather than only on the release. Look for{' '}
+              <em>Good signature</em> and check that the fingerprint gpg prints
+              matches this one; its warning that the key is not certified is
+              expected.
             </p>
             <p className="fingerprint">
               <span className="fingerprint__label">Signing key</span>
@@ -180,7 +191,7 @@ function Build({build, asset, release, open, onToggle}) {
             <p className="verify-links">
               <Link to={release.checksums}>SHA256SUMS</Link>
               <Link to={release.signature}>Signature</Link>
-              <Link to="https://keybase.io/trinitystake">Keybase identity</Link>
+              <Link to={KEYBASE}>Keybase identity</Link>
             </p>
           </li>
           <li>

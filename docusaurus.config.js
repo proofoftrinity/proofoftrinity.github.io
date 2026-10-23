@@ -157,7 +157,7 @@ const config = {
               },
               {
                 label: 'KeyBase',
-                href: 'https://keybase.io/trinitystake',
+                href: 'https://keybase.io/proofoftrinity',
               },
             ],
           },
