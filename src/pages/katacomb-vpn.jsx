@@ -60,14 +60,13 @@ const SHOTS = [
 ];
 
 // `iface` and `runs` describe Linux; the footnote under the table covers
-// Windows. Every protocol runs on Linux.
+// Windows. Every protocol runs on Linux and Windows.
 const PROTOCOLS = [
-  {name: 'WireGuard', iface: 'sntl0', runs: 'root (wg-quick)', notes: 'Uses the distro wireguard-tools', windows: true, multihop: false},
-  {name: 'V2Ray', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'Bundled core; encrypted DNS over DoH', windows: true, multihop: true},
-  {name: 'OpenVPN', iface: 'sntl-ovpn', runs: 'root (openvpn)', notes: "The node's PKI issues the client cert", windows: false, multihop: false},
-  {name: 'XRAY', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'VLESS + Reality; bundled core', windows: true, multihop: true},
-  {name: 'AmneziaWG', iface: 'sntl0', runs: 'root (built into the helper)', notes: 'WireGuard fork with DPI-evasion params', windows: true, multihop: false},
-  {name: 'Hysteria2', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'QUIC; refuses to connect without a TLS pin', windows: true, multihop: false},
+  {name: 'WireGuard', iface: 'sntl0', runs: 'root (wg-quick)', notes: 'Uses the distro wireguard-tools', multihop: false},
+  {name: 'V2Ray', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'Bundled core; encrypted DNS over DoH', multihop: true},
+  {name: 'XRAY', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'VLESS + Reality; bundled core', multihop: true},
+  {name: 'AmneziaWG', iface: 'sntl0', runs: 'root (built into the helper)', notes: 'WireGuard fork with DPI-evasion params', multihop: false},
+  {name: 'Hysteria2', iface: 'sntl-tun', runs: 'userspace + tun2socks', notes: 'QUIC; refuses to connect without a TLS pin', multihop: false},
 ];
 
 // The visitor's system, read only after hydration so the static HTML is the
@@ -184,7 +183,7 @@ export default function KatacombVPN() {
             title="Protocols"
             className="section--flow"
             accentColor={ACCENT}
-            description="Each node runs exactly one. On Linux the client connects to all six and refuses only nodes advertising an unknown type.">
+            description="Each node runs exactly one. The client connects to all five, on Linux and Windows, and refuses nodes advertising any other type.">
             <div className="proto-table-wrap">
               <table className="proto-table">
                 <thead>
@@ -199,11 +198,11 @@ export default function KatacombVPN() {
                   </tr>
                 </thead>
                 <tbody>
-                  {PROTOCOLS.map(({name, iface, runs, notes, windows: onWindows, multihop}) => (
+                  {PROTOCOLS.map(({name, iface, runs, notes, multihop}) => (
                     <tr key={name}>
                       <th scope="row">{name}</th>
                       <Supported yes />
-                      <Supported yes={onWindows} />
+                      <Supported yes />
                       <Supported yes={multihop} />
                       <td>
                         <code>{iface}</code>
@@ -224,8 +223,7 @@ export default function KatacombVPN() {
             <p className="table-footnote">
               Interface and How it runs are for Linux. On Windows, every protocol
               runs through the Katacomb VPN service, on Wintun adapters with the same
-              names. OpenVPN nodes are marked as unavailable in the node list there,
-              and the app refuses them before anything is paid.
+              names.
             </p>
           </Section>
 
@@ -236,17 +234,16 @@ export default function KatacombVPN() {
             accentColor={ACCENT}>
             <p className="security-lead">
               <strong>Node operators are treated as adversaries.</strong> Their
-              handshake data turns into configs that <code>wg-quick</code>,{' '}
-              <code>openvpn</code> and <code>iptables</code> execute as root, and a
-              single <code>PostUp</code> line in a WireGuard config is a root shell.
+              handshake data turns into configs that <code>wg-quick</code> and{' '}
+              <code>iptables</code> execute as root, and a single{' '}
+              <code>PostUp</code> line in a WireGuard config is a root shell.
             </p>
             <div className="security-grid">
               <article className="security-card">
                 <h4>Every config is checked twice</h4>
                 <p>
                   Every node-supplied config passes an allow-list validator first, and
-                  anything not explicitly permitted is rejected, including every
-                  OpenVPN directive that can run a script. The privileged helper
+                  anything not explicitly permitted is rejected. The privileged helper
                   re-validates independently, because its socket is the real trust
                   boundary. On Windows the same helper runs as a LocalSystem service
                   behind a named pipe, under the same rules. The renderer runs

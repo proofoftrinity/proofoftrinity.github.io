@@ -112,7 +112,7 @@ const BUILDS = [
     badge: 'Beta',
     format: 'Installer · x64',
     summary:
-      'Installs the app and a small Windows service: one administrator prompt to install, then connecting never asks again. Every protocol except OpenVPN. Not code-signed yet, so SmartScreen warns; verify it first.',
+      'Installs the app and a small Windows service: one administrator prompt to install, then connecting never asks again. All five protocols. Not code-signed yet, so SmartScreen warns; verify it first.',
     button: 'Download for Windows',
     fallback: 'katacomb-vpn-*-setup.exe',
     language: 'powershell',

@@ -983,7 +983,7 @@ table th {
   margin: 0 auto 0.75rem auto;
 }
 
-/* The six protocols, as a dotted line between the subtitle and the download
+/* The five protocols, as a dotted line between the subtitle and the download
    picker. */
 .hero-protocols {
   display: flex;
